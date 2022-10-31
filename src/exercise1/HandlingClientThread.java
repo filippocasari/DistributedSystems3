@@ -102,9 +102,15 @@ public class HandlingClientThread extends Thread {
 
 
                 message = Message.parseDelimitedFrom(this.in);
-                from = message.getFr();
-                to = message.getTo();
-                msg = message.getMsg();
+                if(message==null){
+                    System.err.print("Message received is null!!\n");
+                    break;
+                }else{
+                    from = message.getFr();
+                    to = message.getTo();
+                    msg = message.getMsg();
+                }
+
 
             }
             operatorThread.oneLessClient(id_client);

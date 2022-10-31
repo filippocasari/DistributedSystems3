@@ -67,16 +67,22 @@ public class HandlerMessagesClient extends Thread{
     }
     public void run(){
         while(!Thread.interrupted()){
-            Message reply_from_server = null;
+            Message reply_from_server;
             try {
                 reply_from_server = Message.parseDelimitedFrom(this.is);
-                from_who = reply_from_server.getFr();
-                if(from_who == 0) {
-                    System.out.println("message from the server: " + msg);
+                if(reply_from_server==null){
+                    System.err.println("Reply from the server is null!!\n");
                 }
-                //to = reply_from_server.getTo();
-                msg = reply_from_server.getMsg();
-                appendTextArea(from_who, msg);
+                else{
+                    from_who = reply_from_server.getFr();
+                    if(from_who == 0) {
+                        System.out.println("message from the server: " + msg);
+                    }
+
+                    msg = reply_from_server.getMsg();
+                    appendTextArea(from_who, msg);
+                }
+
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }

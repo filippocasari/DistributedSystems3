@@ -67,13 +67,17 @@ public class Client2 {
             message = createMessage(this.id_client_to_send, this.message_string);
             message.writeDelimitedTo(os);
             os.flush();
+            int to;
+            String msg;
             while (!inputString.equals("end")) {
 
-                System.out.println("Hey client "+this.id+" insert the receiver");
-                int to = Integer.parseInt(scanner.nextLine());
-                System.out.println("Hey client "+this.id+" insert the message");
-                inputString = scanner.nextLine();
-                message = createMessage(to, inputString);
+                System.out.println("Hey client "+this.id+" insert [receiver][msg]");
+                inputString=scanner.nextLine();
+                to= Integer.parseInt(inputString.substring(0, 1));
+                msg =inputString.substring(1);
+                //System.out.println("Hey client "+this.id+" insert the message");
+                //inputString = scanner.nextLine();
+                message = createMessage(to, msg);
                 message.writeDelimitedTo(os);
                 os.flush();
 
@@ -101,7 +105,7 @@ public class Client2 {
 
     public static void main(String[] args) throws IOException, InterruptedException {
         if (args.length < 5) {
-            System.out.println("Usage: server [ip][port][ownID][id][msg]");
+            System.out.println("Usage: client [ip][port][ownID][id][msg]");
             System.exit(0);
         }
         String message;
