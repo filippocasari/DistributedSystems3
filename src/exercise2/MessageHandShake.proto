@@ -1,0 +1,10 @@
+syntax = "proto2";
+package exercise2;
+
+option java_multiple_files = true;
+option java_package = "exercise2";
+message MessageHandShake{
+  optional int32 id=1;
+  optional bool error= 2;
+
+}

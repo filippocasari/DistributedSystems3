@@ -1,8 +1,9 @@
-package exercise1;
+package exercise2;
 
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class Server {
@@ -10,6 +11,8 @@ public class Server {
 
     public Socket s;
     ConcurrentHashMap<Integer, Socket> clientsSocketsIds;
+    ConcurrentHashMap<Integer, ArrayList<Message>> messagesNotProcessedClients;
+
 
     public Server(int port) throws IOException{
 
@@ -17,8 +20,9 @@ public class Server {
 
             server = new ServerSocket(port);
             System.out.println("Server started");
-            OperatorThread operator = new OperatorThread();
+            exercise2.OperatorThread operator = new exercise2.OperatorThread();
             clientsSocketsIds = new ConcurrentHashMap<>();
+            messagesNotProcessedClients = new ConcurrentHashMap<Integer, ArrayList<Message>>();
             operator.start();
             while (true) {
 
@@ -36,7 +40,7 @@ public class Server {
                 list_clients.add(id);*/
                 System.out.println("connection Established");
                 //System.out.println("Just connected with the id client " + id);
-                HandlingClientThread r = new HandlingClientThread(s, operator, clientsSocketsIds);
+                HandlingClientThread r = new HandlingClientThread(s, operator, clientsSocketsIds, messagesNotProcessedClients);
                 r.start();
 
             }
@@ -52,7 +56,6 @@ public class Server {
         if (args.length != 1) {
             System.out.println("Usage: server [port]");
             return;
-
         }
         Server server = new Server(Integer.parseInt(args[0]));
 

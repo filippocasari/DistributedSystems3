@@ -1,4 +1,7 @@
-package exercise1;
+package exercise2;
+
+import exercise1.HandlerMessagesClient;
+import exercise1.Message;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -64,9 +67,15 @@ public class Client2 {
 
             handlerMessagesClient= new HandlerMessagesClient(this.socket);
             handlerMessagesClient.start();
-            message = createMessage(this.id_client_to_send, this.message_string);
-            message.writeDelimitedTo(os);
-            os.flush();
+            if(this.message_string == null || this.id_client_to_send==-1){
+                System.out.println("not sending first message from command line");
+            }
+            else{
+                message = createMessage(this.id_client_to_send, this.message_string);
+                message.writeDelimitedTo(os);
+                os.flush();
+            }
+
             int to;
             String msg;
             while (!inputString.equals("end")) {
@@ -89,6 +98,8 @@ public class Client2 {
 
         } catch (Exception e) {
             System.err.println("something went wrong");
+            e.printStackTrace();
+
         }
         finally {
             if(handlerMessagesClient!=null){
@@ -104,18 +115,31 @@ public class Client2 {
     }
 
     public static void main(String[] args) throws IOException, InterruptedException {
-        if (args.length < 5) {
+
+        if (args.length<3) {
             System.out.println("Usage: client [ip][port][ownID][id][msg]");
-            System.exit(0);
+            System.out.println("[id][msg] of can be optional ");
+            return;
         }
-        String message;
-        StringBuilder sb = new StringBuilder();
-        for(int i=4; i< args.length; i++)
-        {
-            sb.append(args[i]).append(" ");
+
+
+        String message=null;
+        Client2 client;
+        int id_to_send;
+        if(args.length>3){
+            id_to_send = Integer.parseInt(args[3]);
+            StringBuilder sb = new StringBuilder();
+            for(int i=4; i< args.length; i++)
+            {
+                sb.append(args[i]).append(" ");
+            }
+            message = sb.toString();
+            client = new Client2(args[0], Integer.parseInt(args[1]),Integer.parseInt(args[2]) , id_to_send , message);
+
+        }else{
+            client = new Client2(args[0], Integer.parseInt(args[1]),Integer.parseInt(args[2]) , -1 , message);
         }
-        message = sb.toString();
-        Client2 client = new Client2(args[0], Integer.parseInt(args[1]),Integer.parseInt(args[2]) , Integer.parseInt(args[3]) , message);
+        //Client2 client = new Client2(args[0], Integer.parseInt(args[1]),Integer.parseInt(args[2]) , -1 , message);
         client.readServerResponse();
 
         System.out.println("Client shutting down...");
