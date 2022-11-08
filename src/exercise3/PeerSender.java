@@ -10,45 +10,42 @@ import exercise1.Message;
 import exercise2.MessageHandShake;
 
 public class PeerSender extends Thread{
+    public int itsPort;
     Scanner scanner;
     String inputString = "";
     Message message;
-    int id;
+    int myId;
+    int itsId;
+
+    String itsIp;
     Socket peer;
     int to;
-    int port;
-    String ip;
+    int myPort;
+    String myIp;
+
     private OutputStream os;
     private InputStream is;
 
 
-    public PeerSender(int id, String ip, int port) {
-        this.id = id;
-        this.port = port;
-        this.ip = ip;
+    public PeerSender(int myPort, String myIp, int itsPort, String itsIp,int itsId , int myId) {
+        this.itsId = itsId;
+        this.itsIp = itsIp;
+        this.itsPort = itsPort;
+        this.myId = myId;
+        this.myIp = myIp;
+        this.myPort = myPort;
 
     }
     public void run(){
         scanner = new Scanner(System.in);
         int to;
         String msg;
-        do {
-            System.out.println("Hey client " + this.id + " insert [receiver][msg]");
-            inputString = scanner.nextLine();
-            to = Integer.parseInt(inputString.substring(0, 1));
-            msg = inputString.substring(1);
-            if(isPeerConnected()){
-                System.out.println("The peer "+to+" is reachable");
-                break;
-            }else{
-                System.out.println("The peer "+to+" is not reachable now\nwaiting 3 secs");
-                try {
-                    Thread.sleep(3000);
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        }while(true);
+
+        System.out.println("Hey client " + this.myId + " insert [receiver][msg]");
+        inputString = scanner.nextLine();
+        to = Integer.parseInt(inputString.substring(0, 1));
+        msg = inputString.substring(1);
+
 
         while (!inputString.equals("end")) {
 
@@ -63,27 +60,17 @@ public class PeerSender extends Thread{
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-            System.out.println("Hey client " + this.id + " insert [receiver][msg]");
+            System.out.println("Hey client " + this.myId + " insert [receiver][msg]");
             inputString = scanner.nextLine();
             to = Integer.parseInt(inputString.substring(0, 1));
             msg = inputString.substring(1);
         }
     }
 
-    private boolean isPeerConnected() {
-        try{
-            peer = new Socket(this.ip, this.port);
 
-            System.out.println("Client is trying to connect to " + this.ip + ":" + this.port);
-            return true;
-
-        }catch (Exception e){
-            return false;
-        }
-    }
 
     private Message createMessage(int to, String msg){
 
-        return Message.newBuilder().setFr(this.id).setTo(to).setMsg(msg).build();
+        return Message.newBuilder().setFr(this.myId).setTo(to).setMsg(msg).build();
     }
 }

@@ -11,73 +11,89 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ConcurrentSkipListSet;
 
 public class Peer {
-    String id;
+    int id;
 
     final String ip = "127.0.0.1";
     int port;
     private OutputStream os;
     private InputStream is;
     Socket socket;
-    private ServerSocket server;
-    Scanner scanner;
-    ConcurrentHashMap<Integer, Socket> otherPeersSocket;
-    ConcurrentSkipListSet<Socket> otherPeers;
-    Socket socket1;
 
-    public Peer(String id, int port, List<String> s) throws IOException {
+
+    Scanner scanner;
+    InputStream in ;
+    OutputStream out ;
+    ConcurrentHashMap<Integer, Socket> otherPeersSocket;
+    ConcurrentHashMap<Integer, Boolean> concurrentHashMapIdsKnown;
+    List<String> s;
+
+
+    public Peer(int id, int port, List<String> s) throws IOException {
         this.id = id;
         this.port = port;
         scanner = new Scanner(System.in);
         otherPeersSocket = new ConcurrentHashMap<>();
+        this.s = s;
+        this.concurrentHashMapIdsKnown = new ConcurrentHashMap<Integer, Boolean>();
+
+
+        //ClientPeerThread clientPeerThread = new ClientPeerThread();
+        //clientPeerThread.start();
+
+
+
+    }
+    private void startingPeer() throws IOException, InterruptedException {
+
+
+        PeerHandshake[] arrayPeerHandshake = new PeerHandshake[s.size()];
         for(int i=0; i<s.size(); i=i+2){
             System.out.println(i);
             try {
 
                 int port_peer = Integer.parseInt((s.get(i+1)));
-
+                this.concurrentHashMapIdsKnown.put(port_peer, false);
                 String ip =s.get(i);
                 //socket1 = new Socket(, Integer.parseInt());
                 //otherPeers.add(socket1);
-                PeerSender peerSender = new PeerSender(Integer.parseInt(this.id), ip, port_peer);
-                peerSender.start();
+                ServerPeer serverPeer = new ServerPeer(this.port, concurrentHashMapIdsKnown);
+                serverPeer.start();
+                arrayPeerHandshake[i] = new PeerHandshake(this.port, this.ip, port_peer, ip, this.concurrentHashMapIdsKnown);
+
+                arrayPeerHandshake[i].start();
+
 
             }catch (Exception e){
                 System.err.println("Peer "+s.get(i)+ " is not reachable" );
                 e.printStackTrace();
             }
+
         }
-        ClientPeerThread clientPeerThread = new ClientPeerThread();
-        clientPeerThread.start();
 
 
-
-    }
-    private void startingPeer() throws IOException {
         ClientPeerThread clientPeerThread = new ClientPeerThread();
         clientPeerThread.start();
         /*socket = new Socket(this.ip, this.port);
         is = (this.socket
                 .getInputStream());
         os = (this.socket.getOutputStream());*/
-        server = new ServerSocket(port);
-        while(true){
-            Socket s = server.accept();
-            System.out.println("connection Established");
 
-        }
 
     }
 
-    public static void main(String[] args) throws IOException {
+
+
+    public static void main(String[] args) throws IOException, InterruptedException {
         List<String> list = new ArrayList<>();
         if(args.length>2){
             list.addAll(Arrays.asList(args).subList(2, args.length));
         }
         System.out.println(list);
-        Peer peer = new Peer(args[0], Integer.parseInt(args[1]), list);
+        Peer peer = new Peer(Integer.parseInt(args[0]), Integer.parseInt(args[1]), list);
 
         peer.startingPeer();
     }
