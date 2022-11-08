@@ -1,4 +1,7 @@
-package exercise1;
+package exercise3;
+
+
+import exercise1.Message;
 
 import javax.swing.*;
 import java.awt.*;
@@ -9,16 +12,16 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 
-public class HandlerMessagesClient extends Thread{
+public class ClientPeerThread extends Thread{
     JFrame frame;
     TextArea textArea;
-    Socket socket;
+    //Socket socket;
     private OutputStream os;
     private InputStream is;
     String msg;
     int from_who;
-    public HandlerMessagesClient(Socket socket) throws IOException {
-        this.socket = socket;
+    public ClientPeerThread() throws IOException {
+        //this.socket = socket;
         frame = new JFrame("CHAT");
 
 
@@ -57,15 +60,16 @@ public class HandlerMessagesClient extends Thread{
         frame.setSize(400,300);
 
         frame.setVisible(true);
-        is = (this.socket
-                .getInputStream());
-        os = (this.socket.getOutputStream());
+        //is = (this.socket
+        //        .getInputStream());
+        //os = (this.socket.getOutputStream());
 
     }
     public void run(){
+
         while(!Thread.interrupted()){
             Message reply_from_server;
-            try {
+            /*try {
                 reply_from_server = Message.parseDelimitedFrom(this.is);
                 if(reply_from_server==null){
                     System.err.println("Reply from the server is null!!\n");
@@ -82,7 +86,7 @@ public class HandlerMessagesClient extends Thread{
 
             } catch (IOException e) {
                 throw new RuntimeException(e);
-            }
+            }*/
 
         }
     }
@@ -92,3 +96,4 @@ public class HandlerMessagesClient extends Thread{
         frame.repaint();
     }
 }
+
